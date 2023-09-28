@@ -1,30 +1,26 @@
-import { nanoid } from 'nanoid';
 import { Item } from './ContactItem.styled';
 import { Button } from 'components/ContactForm/ContactForm.styled';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteContact } from 'redux/contactsSlice';
+import { deleteContact } from 'redux/operations';
+import { selectContacts, selectFilter } from 'redux/selectors';
 
 export const ContactItem = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
+  const filter = useSelector(selectFilter);
 
-   const dispatch = useDispatch();
-    const contacts = useSelector(state => state.contacts);
-    const filter = useSelector(state => state.filter);
-    
-     const filteredList = () => {
-    return contacts.filter(({ name }) =>
-      name.toLowerCase().includes(filter.toLowerCase())
-    );
-  };
-    
+  const filteredContacts = contacts.filter(({ name }) =>
+    name.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  return filteredContacts.map(({ name, phone, id }) => {
     return (
-        
-        filteredList().map(({name, number, id}) => {
-            return (
-                <Item key={nanoid()}>{name}: {number}
-                    <Button onClick={() => dispatch(deleteContact(id))} type="button">Delete</Button>
-                </Item>
-            )
-        })
-       
-    )
-}
+      <Item key={id}>
+        {name}: {phone}
+        <Button onClick={() => dispatch(deleteContact(id))} type="button">
+          Delete
+        </Button>
+      </Item>
+    );
+  });
+};
